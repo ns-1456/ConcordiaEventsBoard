@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Concordia Events Board</title>
+  <meta name="description" content="Post and find study sessions, exam prep, club events and more around Concordia." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="#/">
+        <span class="logo" aria-hidden="true">CE</span>
+        <span class="brand-text">
+          <strong>Concordia Events</strong>
+          <small class="tag">Study sessions, exam prep & clubs</small>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="#/" data-nav="events">Events</a>
+        <a href="#/clubs" data-nav="clubs">Clubs</a>
+      </nav>
+      <div class="top-actions">
+        <button class="btn light" id="openPost">+ Post</button>
+        <span id="userSlot"></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" id="view" aria-live="polite"></main>
+
+  <footer class="wrap foot">Student-made project · not affiliated with or endorsed by Concordia University.</footer>
+
+  <!-- Auth dialog -->
+  <dialog id="authDialog">
+    <form id="authForm" class="dlg" novalidate>
+      <div class="dlg-head">
+        <h2 id="authTitle">Log in</h2>
+        <button type="button" class="icon" data-close aria-label="Close">✕</button>
+      </div>
+      <p class="muted small" id="authReason" hidden></p>
+      <label data-signup hidden><span>Name</span>
+        <input name="name" autocomplete="name" maxlength="60" placeholder="Fady" />
+      </label>
+      <label><span>Email</span>
+        <input name="email" type="email" autocomplete="email" required placeholder="you@live.concordia.ca" />
+      </label>
+      <label><span>Password</span>
+        <input name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="At least 8 characters" />
+      </label>
+      <p class="error" id="authError" hidden></p>
+      <button type="submit" class="btn primary block" id="authSubmit">Log in</button>
+      <p class="center small" id="authSwitch"></p>
+    </form>
+  </dialog>
+
+  <!-- Post event dialog -->
+  <dialog id="postDialog">
+    <form id="postForm" class="dlg" novalidate>
+      <div class="dlg-head">
+        <h2>Post an event</h2>
+        <button type="button" class="icon" data-close aria-label="Close">✕</button>
+      </div>
+
+      <label><span>Post as</span>
+        <select name="club_id" id="fPostAs"></select>
+      </label>
+
+      <label><span>Title *</span>
+        <input name="title" required maxlength="120" placeholder="COMP 348 final exam prep — past exams walkthrough" />
+      </label>
+
+      <div class="row">
+        <label><span>Course <span class="muted">(optional)</span></span>
+          <input name="course" maxlength="20" placeholder="COMP 348" />
+        </label>
+        <label><span>Category *</span>
+          <select name="category" id="fCategory" required></select>
+        </label>
+      </div>
+
+      <div class="row">
+        <label><span>Building *</span>
+          <select name="building" id="fBuilding" required></select>
+        </label>
+        <label><span>Floor</span>
+          <input name="floor" maxlength="20" placeholder="5th" />
+        </label>
+        <label><span>Room</span>
+          <input name="room" maxlength="20" placeholder="H-529" />
+        </label>
+      </div>
+      <label><span>Location details <span class="muted">(optional)</span></span>
+        <input name="location_note" maxlength="120" placeholder="Tables by the windows / Discord link / look for the red sign" />
+      </label>
+
+      <div class="row">
+        <label><span>Starts *</span><input name="starts_at" type="datetime-local" required /></label>
+        <label><span>Ends *</span><input name="ends_at" type="datetime-local" required /></label>
+      </div>
+
+      <label><span>Description</span>
+        <textarea name="description" rows="4" maxlength="2000" placeholder="What will you cover? What should people bring?"></textarea>
+      </label>
+
+      <div class="row">
+        <label><span>Contact <span class="muted">(optional)</span></span>
+          <input name="contact" maxlength="120" placeholder="Discord @handle or email" />
+        </label>
+        <label><span>Capacity</span>
+          <input name="capacity" type="number" min="1" max="10000" placeholder="—" />
+        </label>
+      </div>
+
+      <p class="error" id="postError" hidden></p>
+      <div class="dlg-actions">
+        <button type="button" class="btn" data-close>Cancel</button>
+        <button type="submit" class="btn primary" id="postSubmit">Post event</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Create club dialog -->
+  <dialog id="clubDialog">
+    <form id="clubForm" class="dlg" novalidate>
+      <div class="dlg-head">
+        <h2>Create a club</h2>
+        <button type="button" class="icon" data-close aria-label="Close">✕</button>
+      </div>
+      <label><span>Club name *</span>
+        <input name="name" required maxlength="80" placeholder="Concordia Robotics Club" />
+      </label>
+      <label><span>Type</span>
+        <select name="type" id="fClubType"></select>
+      </label>
+      <label><span>About</span>
+        <textarea name="description" rows="4" maxlength="1500" placeholder="What does your club do? When do you usually meet?"></textarea>
+      </label>
+      <label><span>Link <span class="muted">(Instagram, Discord, website…)</span></span>
+        <input name="links" maxlength="200" placeholder="https://instagram.com/yourclub" />
+      </label>
+      <p class="muted small">You'll be the club owner. You can add other admins from the club page.</p>
+      <p class="error" id="clubError" hidden></p>
+      <div class="dlg-actions">
+        <button type="button" class="btn" data-close>Cancel</button>
+        <button type="submit" class="btn primary">Create club</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>
